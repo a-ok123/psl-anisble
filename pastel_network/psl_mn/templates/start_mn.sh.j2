@@ -1,0 +1,4 @@
+#!/bin/bash
+IP=$(curl ipinfo.io/ip)
+echo \"External IP = \"$IP
+./pasteld -masternode -txindex=1 -reindex -masternodeprivkey={{ mn_priv_key }} -externalip=$IP -daemon

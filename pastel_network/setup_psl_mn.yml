@@ -1,0 +1,28 @@
+---
+- hosts: new_nodes
+  handlers:
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
+  tasks:
+    # - name: "OS Hardening"
+    #   include_role:
+    #     name: konstruktoid.hardening
+    #   vars:  
+    #     sshd_admin_net:
+    #       - 0.0.0.0/0
+
+    - name: "Fix stuff after hardening"
+      become: yes
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.replace }}"
+      with_items:
+        - { regexp: 'ClientAliveCountMax 0', replace: '#ClientAliveCountMax 0'}
+        - { regexp: 'ClientAliveInterval 300', replace: '#ClientAliveInterval 300'}
+      notify: "restart sshd"
+
+    - include_role:
+        name: psl_mn

@@ -1,0 +1,19 @@
+---
+
+- hosts: new_ec2s
+  become: yes
+  tasks:
+    - name: Add new user
+      user:
+        name: animecoinuser
+        #created with - openssl passwd -salt "SomeSalt" -1 "<password>" 
+        password: $1$SomeSalt$C9GFt3NZIbXkWB29irMWt.
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+    - name: "Add authorized keys"
+      authorized_key:
+        user: animecoinuser
+        state: present
+#        key: "{{ lookup('file', '~/private/keys/mnpair-new.pub') }}"
+        key: "{{ lookup('file', '~/private/keys/testnet.anime.key.pub') }}"

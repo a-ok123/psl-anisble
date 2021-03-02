@@ -1,0 +1,92 @@
+---
+# tasks file for psl_mn
+
+- name: create pastel directory
+  file:
+    path: ~/pastel
+    state: directory
+
+- name: copy pastel executables
+  copy:
+    src: "{{ role_path }}/files/{{item.src}}"
+    dest: "~/pastel/{{item.dest}}"
+    mode: '0700'
+  with_items:
+    - { src: 'ubuntu-1804-amd64-pasteld', dest: 'pasteld'}
+    - { src: 'ubuntu-1804-amd64-pastel-cli', dest: 'pastel-cli'}
+    - { src: 'fetch-params.sh', dest: 'fetch-params.sh'}
+    - { src: 'start_node.sh', dest: 'start_node.sh'}
+
+- name: fetch params
+  shell: ~/pastel/fetch-params.sh
+
+- name: create pastel config directory
+  file:
+    path: ~/.pastel
+    state: directory
+
+- name: create pastel config file
+  template:
+    src: pastel.conf.j2
+    dest: ~/.pastel/pastel.conf
+      
+- name: Install gcc
+  become: yes
+  apt:
+    name: gcc
+
+- name: start node
+  shell: ~/pastel/start_node.sh
+  args:
+    chdir: pastel/
+  register: psld
+
+- debug: var=psld.stdout_lines
+
+- name: sleep for 30 seconds and continue with play
+  wait_for:
+    timeout: 30
+
+- name: getinfo
+  shell: ~/pastel/pastel-cli getinfo
+  register: pslcli
+
+- debug: var=pslcli.stdout_lines
+
+# - name: genkey
+#   shell: ~/pastel/pastel-cli masternode genkey
+#   register: privkey
+
+# - name: setkey
+#   set_fact: mn_priv_key={{ privkey.stdout }}
+
+# - name: create start masternode script
+#   template:
+#     src: start_mn.sh.j2
+#     dest: ~/pastel/start_mn.sh
+#     mode: '0755'
+
+# - name: stop node
+#   shell: ~/pastel/pastel-cli stop
+
+# - name: sleep for 5 seconds and continue with play
+#   wait_for:
+#     timeout: 5
+
+# - name: start masternode
+#   shell: ~/pastel/start_mn.sh
+#   args:
+#     chdir: pastel/
+#   register: psld
+
+# - debug: var=psld.stdout_lines
+
+# - name: sleep for 30 seconds and continue with play
+#   wait_for:
+#     timeout: 30
+
+# - name: getinfo
+#   shell: ~/pastel/pastel-cli getinfo
+#   register: pslcli
+
+# - debug: var=pslcli.stdout_lines

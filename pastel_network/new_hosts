@@ -1,0 +1,12 @@
+all:
+    hosts:
+    children:
+        new_ec2s:
+            hosts:
+                new:
+                    ansible_host: ec2-18-217-242-134.us-east-2.compute.amazonaws.com
+            vars: 
+                ansible_connection: ssh
+                ansible_user: ubuntu
+                ansible_ssh_private_key_file: ~/private/keys/mnpair-new.pem
+                

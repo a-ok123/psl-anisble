@@ -1,0 +1,5 @@
+server=1
+listen=1
+
+rpcuser=user{{ inventory_hostname_short }}abc
+rpcpassword={{ ansible_fqdn | to_uuid }}
